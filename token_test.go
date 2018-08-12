@@ -8,22 +8,22 @@ import (
 	"github.com/scottshotgg/token2"
 )
 
-func TestNewIntFromInt(t *testing.T) {
+func TestNewToken(r *testing.T) {
 	intToken := token2.NewIntFromInt(77)
 	intTokenJSON, err := json.Marshal(intToken)
 	if err != nil {
 
 	}
-
 	fmt.Println(string(intTokenJSON))
-}
 
-func TestNewInt(t *testing.T) {
-	intToken := token2.NewInt()
-	intTokenJSON, err := json.Marshal(intToken)
+	err = intToken.ToIdent("name")
 	if err != nil {
 
 	}
 
+	intTokenJSON, err = json.Marshal(intToken)
+	if err != nil {
+
+	}
 	fmt.Println(string(intTokenJSON))
 }

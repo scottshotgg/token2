@@ -1,33 +1,93 @@
 package token2
 
-type IdentifierToken struct {
-	*LiteralToken
-	name           string
-	accessModifier AccessModifierType
-}
+import "errors"
 
-func (i *IdentifierToken) GetName() string {
-	return i.name
-}
+// TODO: alternatively, we could enforce these types to the functions
+// through enumerating new types like IntToken, StringToken, etc, and
+// use the Token and Value types as an interface
 
-func (i *IdentifierToken) GetAccessModifier() AccessModifierType {
-	return i.accessModifier
-}
-
-func NewIdentFromInt() *IdentifierToken {
-	return &IdentifierToken{
-		LiteralToken: NewInt(),
+// ToIdent creates a new ident token
+func (t *Token) ToIdent(name string) error { // (*Token, error) {
+	if name == "" {
+		return errors.New("Ident name cannot be empty")
 	}
+
+	// Upgrade ident from a literal by setting the type and name
+	t.SetTokenType(Ident)
+	t.SetName(name)
+
+	return nil
 }
 
-// func NewIdentFromBool() {
-// 	i := NewBool()
+// func (t *Token) NewIdentFromInt(name string) error {
+// 	// TODO: implement this later
+// 	// if t.GetTokenType() != Literal {
+
+// 	// }
+// 	// if t.GetValue().GetValueType() != IntValue {
+
+// 	// }
+
+// 	return toIdent(name, t)
 // }
 
-// func NewIdentFromFloat() {
-// 	i := NewFloat()
+// // TODO: these should take actual values
+// func (t *Token) NewIdentFromBool(name string) error {
+// 	// TODO: implement this later
+// 	// if t.GetTokenType() != Literal {
+
+// 	// }
+// 	// if t.GetValue().GetValueType() != IntValue {
+
+// 	// }
+
+// 	return toIdent(name, t)
 // }
 
-// func NewIdentFromString() {
-// 	i := NewString()
+// func (t *Token) NewIdentFromChar(name string) error {
+// 	// TODO: implement this later
+// 	// if t.GetTokenType() != Literal {
+
+// 	// }
+// 	// if t.GetValue().GetValueType() != IntValue {
+
+// 	// }
+
+// 	return toIdent(name, t)
+// }
+
+// func (t *Token) NewIdentFromFloat(name string) error {
+// 	// TODO: implement this later
+// 	// if t.GetTokenType() != Literal {
+
+// 	// }
+// 	// if t.GetValue().GetValueType() != IntValue {
+
+// 	// }
+
+// 	return toIdent(name, t)
+// }
+
+// func (t *Token) NewIdentFromString(name string) error {
+// 	// TODO: implement this later
+// 	// if t.GetTokenType() != Literal {
+
+// 	// }
+// 	// if t.GetValue().GetValueType() != IntValue {
+
+// 	// }
+
+// 	return toIdent(name, t)
+// }
+
+// func (t *Token) NewIdentFromVar(name string) error {
+// 	// TODO: implement this later
+// 	// if t.GetTokenType() != Literal {
+
+// 	// }
+// 	// if t.GetValue().GetValueType() != IntValue {
+
+// 	// }
+
+// 	return toIdent(name, t)
 // }

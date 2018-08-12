@@ -1,43 +1,89 @@
 package token2
 
+import "github.com/pkg/errors"
+
 type (
-	Token interface {
-		GetID() int
-		GetTokenType() TokenType
-		GetNextExpected() TokenType
-		GetProperties() map[string]Token
-
-		SetID(int)
-		SetTokenType(TokenType)
-		SetExpected(TokenType)
-		SetProperty(string, Token) error
-
-		String() string
-		// MarshalJSON() ([]byte, error)
-	}
-
-	Value interface {
-		// GetName() string
-		GetValueType() ValueType
-		// GetActingType() ValueType // TODO: I think this would be an extra method on var?
-		GetTrueValue() interface{}
-		// String() string
-		GetStringValue() string
-		// GetAccessModifier() AccessModifierType
-	}
-
 	TokenType          string
 	ValueType          string
 	AccessModifierType string
+
+	Token struct {
+		Name  string
+		ID    int
+		Type  TokenType
+		Value *Value
+	}
+	// SetID(int) error
+	// SetTokenType(TokenType) error
+	// SetValue(Value) error
+
+	// String() string
+	// Express() string
+	// Translate() string
+
+	Value struct {
+		Type  ValueType
+		True  interface{}
+		Props map[string]Token // might need a mutex here later
+	}
+	// String() string // don't know if we need this
 )
 
-// func (t *Token) UnmarshalJSON() {
+func (t *Token) GetName() string         { return t.Name }
+func (t *Token) GetID() int              { return t.ID }
+func (t *Token) GetTokenType() TokenType { return t.Type }
+func (t *Token) GetValue() *Value        { return t.Value }
 
+func (t *Token) SetName(name string) {
+	t.Name = name
+}
+func (t *Token) SetID(id int) {}
+func (t *Token) SetTokenType(tokenType TokenType) {
+	t.Type = tokenType
+}
+func (t *Token) SetValue(value *Value) error {
+	tValue := t.GetValue().GetValueType()
+	switch tValue {
+	case VarValue:
+		value.SetValueType(VarValue)
+		fallthrough
+	case SetValue:
+	default:
+		// TODO: this is where we would add type coersions, type degradations, etc
+		if tValue != value.GetValueType() {
+			return errors.Errorf("Value type does not match declared token's value type; value: %s token: %s", value.GetValueType(), tValue)
+		}
+	}
+
+	t.Value = value
+	return nil
+}
+
+func (v *Value) GetValueType() ValueType         { return v.Type }
+func (v *Value) GetTrue() interface{}            { return v.True }
+func (v *Value) GetProperty(prop string) Token   { return v.Props[prop] }
+func (v *Value) GetProperties() map[string]Token { return v.Props }
+
+func (v *Value) SetValueType(valueType ValueType)             {}
+func (v *Value) SetTrue(trueValue interface{})                {}
+func (v *Value) SetProperty(propName string, propValue Token) {}
+func (v *Value) SetProperties(props map[string]Token)         {}
+
+func newToken(name string, tokenType TokenType, value *Value) *Token {
+	return &Token{
+		Name:  name,
+		Type:  tokenType,
+		Value: value,
+	}
+}
+
+// func newValue() Value {
+// 	return Value{}
 // }
 
 // FIXME: downcase all of these
 const (
-	Base         TokenType = "BASE"
+	// Base         TokenType = "BASE"
 	Custom       TokenType = "CUSTOM"
 	Literal      TokenType = "LITERAL"
 	Var          TokenType = "VAR"
@@ -83,27 +129,24 @@ const (
 )
 
 const (
-	VarValue      ValueType = "var"
+	// NotSetValue ValueType = "not_set"
+	SetValue      ValueType = "set"
+	VoidValue     ValueType = "void"
 	IntValue      ValueType = "int"
-	FloatValue    ValueType = "float"
-	StringValue   ValueType = "string"
 	BoolValue     ValueType = "bool"
 	CharValue     ValueType = "char"
-	ObjectValue   ValueType = "object"
+	FloatValue    ValueType = "float"
+	StringValue   ValueType = "string"
+	VarValue      ValueType = "var"
+	FunctionValue ValueType = "function"
 	ArrayValue    ValueType = "array"
-	SetValue      ValueType = "set"
-	IntArrayValue ValueType = "int[]"
+	ObjectValue   ValueType = "object"
+	StructValue   ValueType = "struct"
+
+	// IntArrayValue ValueType = "int[]"
 )
 
 const (
 	PublicAccessModifier  AccessModifierType = "public"
 	PrivateAccessModifier AccessModifierType = "private"
 )
-
-func New() Token {
-	return NewBaseToken()
-}
-
-// func NewValue() Value {
-// 	return &DefaultValue{}
-// }
